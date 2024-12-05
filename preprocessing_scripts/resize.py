@@ -17,7 +17,7 @@ def resize_images_in_directory(input_dir, output_dir):
                     width, height = img.size
 
                     # Only resize if both dimensions are >= 512
-                    if width >= 512 and height >= 512:
+                    if width >= 512 and height >= 256:
                         new_size = (512, 512)
                         resized_img = img.resize(new_size, Image.LANCZOS)
                         
@@ -32,6 +32,6 @@ def resize_images_in_directory(input_dir, output_dir):
 
 
 # Example usage
-input_directory = 'C:\\Users\\sophi\\OneDrive\\Documents\\Bimsara\\DataSet\\thaibatik'
-output_directory = 'C:\\Users\\sophi\\OneDrive\\Documents\\Bimsara\\DataSet\\thai_batik_sized'
+input_directory = '/home/lenovo/fyp/VasthraAI_POC/preprocessed_dataset'
+output_directory = '/home/lenovo/fyp/VasthraAI_POC/resized_images'
 resize_images_in_directory(input_directory, output_directory)
