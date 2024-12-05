@@ -16,8 +16,8 @@ def resize_images_in_directory(input_dir, output_dir):
                     # Get original dimensions
                     width, height = img.size
 
-                    # Only resize if both dimensions are >= 512
-                    if width >= 512 and height >= 256:
+                    # Only resize if both dimensions are >= 256
+                    if width >= 256 and height >= 256:
                         new_size = (512, 512)
                         resized_img = img.resize(new_size, Image.LANCZOS)
                         
