@@ -21,7 +21,7 @@ def copy_images(source_dir, target_dir):
     print("All PNG and JPG images have been copied successfully.")
 
 # Example usage
-source_directory = "C:\\Users\\sophi\\OneDrive\\Documents\\Bimsara\\DataSet\\archive(2)"  # Replace with your source directory path
-target_directory = "C:\\Users\\sophi\\OneDrive\\Documents\\Bimsara\\DataSet\\images"  # Replace with your target directory path
+source_directory = "/home/lenovo/fyp/VasthraAI_POC/batiks"  # Replace with your source directory path
+target_directory = "/home/lenovo/fyp/VasthraAI_POC/preprocessed_dataset"  # Replace with your target directory path
 
 copy_images(source_directory, target_directory)
