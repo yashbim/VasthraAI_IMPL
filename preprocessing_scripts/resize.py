@@ -26,7 +26,7 @@ def resize_images_in_directory(input_dir, output_dir):
                         resized_img.save(output_path)
                         print(f"Resized {filename} to {new_size} and saved to {output_path}")
                     else:
-                        print(f"Skipped {filename} (smaller than 512x512)")
+                        print(f"Skipped {filename} (smaller than 256,256)")
             except Exception as e:
                 print(f"Error processing {filename}: {e}")
 
