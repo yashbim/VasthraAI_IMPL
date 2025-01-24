@@ -37,8 +37,7 @@ output_directory = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\proc
 resize_images_in_directory(input_directory, output_directory)
 
 
-import os
-from PIL import Image
+# changing greyscale to rgb
 
 # Define paths
 source_dir = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\processed_dataset1'
