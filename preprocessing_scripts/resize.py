@@ -18,7 +18,7 @@ def resize_images_in_directory(input_dir, output_dir):
 
                     # Only resize if both dimensions are >= 256
                     if width >= 256 and height >= 256:
-                        new_size = (512, 512)
+                        new_size = (256, 256)
                         resized_img = img.resize(new_size, Image.LANCZOS)
                         
                         # Save the resized image in the output directory
@@ -32,6 +32,6 @@ def resize_images_in_directory(input_dir, output_dir):
 
 
 # Example usage
-input_directory = '/home/lenovo/fyp/VasthraAI_POC/preprocessed_dataset'
-output_directory = '/home/lenovo/fyp/VasthraAI_POC/resized_images'
+input_directory = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\initial_dataset'
+output_directory = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\processed_dataset'
 resize_images_in_directory(input_directory, output_directory)
