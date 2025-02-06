@@ -13,28 +13,22 @@ def resize_images_in_directory(input_dir, output_dir):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif')):
             try:
                 with Image.open(input_path) as img:
-                    # Get original dimensions
-                    width, height = img.size
-
-                    # Only resize if both dimensions are >= 256
-                    if width >= 256 and height >= 256:
-                        new_size = (256, 256)
-                        resized_img = img.resize(new_size, Image.LANCZOS)
-                        
-                        # Save the resized image in the output directory
-                        output_path = os.path.join(output_dir, filename)
-                        resized_img.save(output_path)
-                        print(f"Resized {filename} to {new_size} and saved to {output_path}")
-                    else:
-                        print(f"Skipped {filename} (smaller than 256,256)")
+                    # Resize the image to 512x512
+                    new_size = (512, 512)
+                    resized_img = img.resize(new_size, Image.LANCZOS)
+                    
+                    # Save the resized image in the output directory
+                    output_path = os.path.join(output_dir, filename)
+                    resized_img.save(output_path)
+                    print(f"Resized {filename} to {new_size} and saved to {output_path}")
             except Exception as e:
                 print(f"Error processing {filename}: {e}")
-
 
 # Example usage
 input_directory = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\initial_dataset'
 output_directory = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\processed_dataset1'
 resize_images_in_directory(input_directory, output_directory)
+
 
 
 # changing greyscale to rgb
