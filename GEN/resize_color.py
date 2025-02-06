@@ -1,7 +1,7 @@
 from PIL import Image
 import os
 
-def resize_images_in_directory(input_dir, output_dir):
+def process_images(input_dir, output_dir):
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     
@@ -16,41 +16,24 @@ def resize_images_in_directory(input_dir, output_dir):
                     # Resize the image to 512x512
                     new_size = (512, 512)
                     resized_img = img.resize(new_size, Image.LANCZOS)
-                    
-                    # Save the resized image in the output directory
+
+                    # Convert to RGB if necessary
+                    if resized_img.mode != 'RGB':
+                        resized_img = resized_img.convert('RGB')
+
+                    # Save the processed image in the output directory
                     output_path = os.path.join(output_dir, filename)
                     resized_img.save(output_path)
-                    print(f"Resized {filename} to {new_size} and saved to {output_path}")
+
+                    print(f"Processed {filename} and saved to {output_path}")
             except Exception as e:
                 print(f"Error processing {filename}: {e}")
 
-# Example usage
-input_directory = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\initial_dataset'
-output_directory = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\processed_dataset1'
-resize_images_in_directory(input_directory, output_directory)
+# Define input and output directories
+input_directory = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\GEN\\Dataset\\raw_images'
+output_directory = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\GEN\\Dataset\\real_images'
 
+# Run the function
+process_images(input_directory, output_directory)
 
-
-# changing greyscale to rgb
-
-# Define paths
-source_dir = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\processed_dataset1'
-output_dir = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\processed_dataset2'
-
-# Ensure output directory exists
-os.makedirs(output_dir, exist_ok=True)
-
-# Process images
-for filename in os.listdir(source_dir):
-    if filename.endswith(('.png', '.jpg', '.jpeg')):
-        img_path = os.path.join(source_dir, filename)
-        img = Image.open(img_path)
-
-        # Convert to RGB if necessary
-        if img.mode != 'RGB':
-            img = img.convert('RGB')
-
-        # Save the processed image
-        img.save(os.path.join(output_dir, filename))
-
-print("All images processed and saved in:", output_dir)
+print("All images processed successfully!")
