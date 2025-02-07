@@ -37,17 +37,17 @@ for epoch in range(num_epochs):
         sketches, real_images = sketches.to(device), real_images.to(device)
 
         # Train Discriminator
-        real_labels = torch.ones((real_images.size(0), 1, 1, 1)).to(device)
-        fake_labels = torch.zeros((real_images.size(0), 1, 1, 1)).to(device)
-
         real_preds = discriminator(real_images)
-        real_loss = adversarial_loss(real_preds, real_labels)
-
         fake_images = generator(sketches)
         fake_preds = discriminator(fake_images.detach())
-        fake_loss = adversarial_loss(fake_preds, fake_labels)
 
+        real_labels = torch.ones_like(real_preds).to(device)
+        fake_labels = torch.zeros_like(fake_preds).to(device)
+
+        real_loss = adversarial_loss(real_preds, real_labels)
+        fake_loss = adversarial_loss(fake_preds, fake_labels)
         d_loss = (real_loss + fake_loss) / 2
+
         d_optimizer.zero_grad()
         d_loss.backward()
         d_optimizer.step()
