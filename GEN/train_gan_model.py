@@ -9,9 +9,12 @@ import os
 from sketch_to_image_gan import Generator, Discriminator
 from train_sketch_gan import SketchToImageDataset, transform
 
+# Clear unused GPU memory
+torch.cuda.empty_cache()
+
 # Hyperparameters
 num_epochs = 100
-batch_size = 8
+batch_size = 4  # Reduced batch size to prevent OOM errors
 lr = 0.0002
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -28,7 +31,7 @@ g_optimizer = optim.Adam(generator.parameters(), lr=lr, betas=(0.5, 0.999))
 d_optimizer = optim.Adam(discriminator.parameters(), lr=lr, betas=(0.5, 0.999))
 
 # Load dataset
-dataset = SketchToImageDataset("C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\GEN\\Dataset\\sketches", "C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\GEN\\Dataset\\real_images", transform=transform)
+dataset = SketchToImageDataset("dataset/sketches", "dataset/real_images", transform=transform)
 data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 # Training loop
