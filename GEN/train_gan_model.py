@@ -13,7 +13,7 @@ from train_sketch_gan import SketchToImageDataset, transform
 torch.cuda.empty_cache()
 
 # Hyperparameters
-num_epochs = 100
+num_epochs = 30
 batch_size = 4  # Reduced batch size to prevent OOM errors
 lr = 0.0002
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
