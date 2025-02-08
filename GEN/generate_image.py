@@ -36,5 +36,5 @@ def generate_image(sketch_path, output_path="generated_image.png"):
 
 # Example usage
 if __name__ == "__main__":
-    sketch_file = "path/to/your/sketch.png"  # Replace with your test sketch
+    sketch_file = "C:\\Users\\Bimsara\\Desktop\\sketch.png"  # Replace with your test sketch
     generate_image(sketch_file)
