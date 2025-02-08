@@ -2,7 +2,7 @@
 
 # GEN/generate_image.py
 
-- Run the following to generate images.
+- Run the following to generate images. Added your sketch image path as a command-line argument
 
 ```bash
 python generate_image.py --sketch_path "C:\Users\Bimsara\Desktop\sample\sketch.png"
