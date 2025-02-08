@@ -3,6 +3,7 @@ from torchvision import transforms
 from PIL import Image
 import os
 from datetime import datetime
+import argparse
 from sketch_to_image_gan import Generator  # Import your trained Generator
 
 # Load the trained generator
@@ -48,7 +49,22 @@ def generate_image(sketch_path, output_dir="generated_images"):
     Image.fromarray(generated_image).save(output_path)
     print(f"Generated image saved at: {output_path}")
 
-# Example usage
+# Parse command-line arguments
 if __name__ == "__main__":
-    sketch_file = "C:\\Users\\Bimsara\\Desktop\\sketch.png"  # Replace with your test sketch
-    generate_image(sketch_file)
+    parser = argparse.ArgumentParser(description="Generate an image from a sketch.")
+    parser.add_argument(
+        "--sketch_path",
+        type=str,
+        required=True,
+        help="Path to the input sketch image."
+    )
+    parser.add_argument(
+        "--output_dir",
+        type=str,
+        default="generated_images",
+        help="Directory to save the generated image. Default is 'generated_images'."
+    )
+    args = parser.parse_args()
+
+    # Generate the image
+    generate_image(args.sketch_path, args.output_dir)
