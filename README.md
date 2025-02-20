@@ -1,8 +1,9 @@
-# VasthraAI_POC![Vasthra WHITE](https://github.com/user-attachments/assets/e1ceb98c-de8a-43fb-9eb9-b66e95552177)
+# VasthraAI Implementation Guildlines![Vasthra WHITE](https://github.com/user-attachments/assets/e1ceb98c-de8a-43fb-9eb9-b66e95552177)
 
-# GEN/generate_image.py
+## Generating an image from a sketch
 
-- Run the following to generate images. Added your sketch image path as a command-line argument
+- Navigate to the desired model directory (GEN_x) as per your preference
+- Run the generate_image.py followed by a command-line argument for the path to your sketch as follows.
 
 ```bash
 python generate_image.py --sketch_path "C:\Users\Bimsara\Desktop\sample\sketch.png"
