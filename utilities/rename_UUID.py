@@ -2,7 +2,7 @@ import os
 import uuid
 
 # Manually specify the directory here
-DIRECTORY = r"C:\Users\Bimsara\Downloads\Batik Nitik Sarimbit 120\Dataset"  # Change this to your desired path
+# DIRECTORY = r"C:\Users\Bimsara\Downloads\Batik Nitik Sarimbit 120\Dataset"  # Change this to your desired path
 RECURSIVE = True  # Set to False if you only want to rename top-level files
 
 def rename_files_with_uuid(directory, recursive=False):
