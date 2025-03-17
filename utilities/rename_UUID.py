@@ -1,8 +1,8 @@
 import os
 import uuid
+import argparse
 
-# Manually specify the directory here
-# DIRECTORY = r"C:\Users\Bimsara\Downloads\Batik Nitik Sarimbit 120\Dataset"  # Change this to your desired path
+# Set RECURSIVE as a global variable (you can still modify this manually if needed)
 RECURSIVE = True  # Set to False if you only want to rename top-level files
 
 def rename_files_with_uuid(directory, recursive=False):
@@ -39,5 +39,21 @@ def rename_files_with_uuid(directory, recursive=False):
             except Exception as e:
                 print(f"Error renaming '{file_path}': {e}")
 
+def main():
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description="Rename files in a directory with UUIDs.")
+    parser.add_argument(
+        "--rename_folder",
+        type=str,
+        required=True,
+        help="The directory containing files to rename"
+    )
+
+    # Parse the arguments
+    args = parser.parse_args()
+
+    # Call the rename function with the provided directory
+    rename_files_with_uuid(args.rename_folder, RECURSIVE)
+
 if __name__ == "__main__":
-    rename_files_with_uuid(DIRECTORY, RECURSIVE)
+    main()
