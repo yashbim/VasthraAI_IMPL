@@ -1,7 +1,8 @@
 from PIL import Image
 import os
+import argparse
 
-def resize_images_in_directory(input_dir, output_dir):
+def process_images(input_dir, output_dir):
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     
@@ -16,41 +17,42 @@ def resize_images_in_directory(input_dir, output_dir):
                     # Resize the image to 512x512
                     new_size = (512, 512)
                     resized_img = img.resize(new_size, Image.LANCZOS)
-                    
-                    # Save the resized image in the output directory
+
+                    # Convert to RGB if necessary
+                    if resized_img.mode != 'RGB':
+                        resized_img = resized_img.convert('RGB')
+
+                    # Save the processed image in the output directory
                     output_path = os.path.join(output_dir, filename)
                     resized_img.save(output_path)
-                    print(f"Resized {filename} to {new_size} and saved to {output_path}")
+
+                    print(f"Processed {filename} and saved to {output_path}")
             except Exception as e:
                 print(f"Error processing {filename}: {e}")
 
-# Example usage
-input_directory = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\initial_dataset'
-output_directory = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\processed_dataset1'
-resize_images_in_directory(input_directory, output_directory)
+def main():
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description="Process and resize images to 512x512 in RGB format.")
+    parser.add_argument(
+        "--input_folder",
+        type=str,
+        required=True,
+        help="The directory containing raw images to process"
+    )
+    parser.add_argument(
+        "--output_folder",
+        type=str,
+        required=True,
+        help="The directory where processed images will be saved"
+    )
 
+    # Parse the arguments
+    args = parser.parse_args()
 
+    # Call the process_images function with provided directories
+    process_images(args.input_folder, args.output_folder)
 
-# changing greyscale to rgb
+    print("All images processed successfully!")
 
-# Define paths
-source_dir = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\processed_dataset1'
-output_dir = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\processed_dataset2'
-
-# Ensure output directory exists
-os.makedirs(output_dir, exist_ok=True)
-
-# Process images
-for filename in os.listdir(source_dir):
-    if filename.endswith(('.png', '.jpg', '.jpeg')):
-        img_path = os.path.join(source_dir, filename)
-        img = Image.open(img_path)
-
-        # Convert to RGB if necessary
-        if img.mode != 'RGB':
-            img = img.convert('RGB')
-
-        # Save the processed image
-        img.save(os.path.join(output_dir, filename))
-
-print("All images processed and saved in:", output_dir)
+if __name__ == "__main__":
+    main()

@@ -1,5 +1,6 @@
 from PIL import Image
 import os
+import argparse
 
 def process_images(input_dir, output_dir):
     # Ensure output directory exists
@@ -29,11 +30,29 @@ def process_images(input_dir, output_dir):
             except Exception as e:
                 print(f"Error processing {filename}: {e}")
 
-# Define input and output directories
-input_directory = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\GEN\\Dataset\\raw_images'
-output_directory = 'C:\\Users\\Bimsara\\Documents\\fyp\\IPD\\VasthraAI_POC\\GEN\\Dataset\\real_images'
+def main():
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description="Process and resize images to 512x512 in RGB format.")
+    parser.add_argument(
+        "--input_folder",
+        type=str,
+        required=True,
+        help="The directory containing raw images to process"
+    )
+    parser.add_argument(
+        "--output_folder",
+        type=str,
+        required=True,
+        help="The directory where processed images will be saved"
+    )
 
-# Run the function
-process_images(input_directory, output_directory)
+    # Parse the arguments
+    args = parser.parse_args()
 
-print("All images processed successfully!")
+    # Call the process_images function with provided directories
+    process_images(args.input_folder, args.output_folder)
+
+    print("All images processed successfully!")
+
+if __name__ == "__main__":
+    main()

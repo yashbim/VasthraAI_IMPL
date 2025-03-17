@@ -20,6 +20,6 @@ def process_folder(input_folder, output_folder):
             print(f"Processed: {filename}")
 
 # Example usage
-input_folder = "dataset/real_images"  # Change to your actual folder
-output_folder = "dataset/sketches"
+input_folder = "C:\\Users\\Bimsara\\Documents\\fyp\\VasthraAI_IMPL\\GEN_2\\dataset\\real_images"  # Change to your actual folder
+output_folder = "C:\\Users\\Bimsara\\Documents\\fyp\\VasthraAI_IMPL\\GEN_2\\dataset\\sketches"
 process_folder(input_folder, output_folder)
