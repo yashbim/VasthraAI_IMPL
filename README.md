@@ -13,10 +13,10 @@ python scrape.py
 
 ### resize_color.py
 
-- This script is will crop images into 512x512 images that can be used by the GAN. It also converts greyscale images into RGB.
+- This script is will crop images into 512x512 images that can be used by the GAN. It also converts greyscale images into RGB. To use, run using the following arguments.
 
 ```bash
-python resize_color.py
+python resize_color.py --input_folder "C:\Input\Folder\Path" --output_folder "C:\Output\Folder\Path"
 ```
 
 ### resize_color.py
