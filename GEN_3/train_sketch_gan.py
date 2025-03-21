@@ -41,7 +41,7 @@ transform = transforms.Compose([
 ])
 
 # Load dataset
-dataset = SketchToImageDataset("C:\\Users\\Bimsara\\Documents\\fyp\\VasthraAI_IMPL\\GEN_2\\dataset\\sketches", "C:\\Users\\Bimsara\\Documents\\fyp\\VasthraAI_IMPL\\GEN_2\\dataset\\real_images", transform=transform)
+dataset = SketchToImageDataset("C:\\Users\\Bimsara\\Documents\\fyp\\VasthraAI_IMPL\\GEN_3\\dataset\\sketches", "C:\\Users\\Bimsara\\Documents\\fyp\\VasthraAI_IMPL\\GEN_3\\dataset\\real_images", transform=transform)
 data_loader = DataLoader(dataset, batch_size=4, shuffle=True)
 
 # Check batch

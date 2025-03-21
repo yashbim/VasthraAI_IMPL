@@ -16,7 +16,7 @@ from train_sketch_gan import SketchToImageDataset, transform
 torch.cuda.empty_cache()
 
 # Hyperparameters
-num_epochs = 100  # Increased epochs
+num_epochs = 3  # Increased epochs, adjust as needed for testing
 batch_size = 4
 lr = 0.0002
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -36,8 +36,8 @@ g_optimizer = optim.Adam(generator.parameters(), lr=lr, betas=(0.5, 0.999))
 d_optimizer = optim.Adam(discriminator.parameters(), lr=lr, betas=(0.5, 0.999))
 
 # Load dataset
-dataset = SketchToImageDataset("C:\\Users\\Bimsara\\Documents\\fyp\\VasthraAI_IMPL\\GEN_2\\dataset\\sketches", 
-                             "C:\\Users\\Bimsara\\Documents\\fyp\\VasthraAI_IMPL\\GEN_2\\dataset\\real_images", 
+dataset = SketchToImageDataset("C:\\Users\\Bimsara\\Documents\\fyp\\VasthraAI_IMPL\\GEN_3\\dataset\\sketches", 
+                             "C:\\Users\\Bimsara\\Documents\\fyp\\VasthraAI_IMPL\\GEN_3\\dataset\\real_images", 
                              transform=transform)
 data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
@@ -56,10 +56,6 @@ for epoch in range(num_epochs):
         # Create random noise
         noise = torch.randn(batch_size, noise_dim, sketches.size(2), sketches.size(3), device=device)
         
-        # Create real and fake labels with label smoothing
-        real_labels = torch.ones(batch_size, 1, 16, 16, device=device) * 0.9  # 0.9 instead of 1 for label smoothing
-        fake_labels = torch.zeros(batch_size, 1, 16, 16, device=device) + 0.1  # 0.1 instead of 0 for label smoothing
-
         # -----------------
         # Train Discriminator
         # -----------------
@@ -67,11 +63,15 @@ for epoch in range(num_epochs):
         
         # Train on real images
         real_outputs = discriminator(sketches, real_images)
+        # Create real labels with the same size as discriminator output
+        real_labels = torch.ones_like(real_outputs) * 0.9  # 0.9 instead of 1 for label smoothing
         d_real_loss = adversarial_loss(real_outputs, real_labels)
         
         # Train on fake images
         fake_images = generator(sketches, noise)
         fake_outputs = discriminator(sketches, fake_images.detach())
+        # Create fake labels with the same size as discriminator output
+        fake_labels = torch.zeros_like(fake_outputs) + 0.1  # 0.1 instead of 0 for label smoothing
         d_fake_loss = adversarial_loss(fake_outputs, fake_labels)
         
         # Combined discriminator loss
@@ -88,7 +88,7 @@ for epoch in range(num_epochs):
         fake_images = generator(sketches, noise)
         fake_outputs = discriminator(sketches, fake_images)
         
-        # Adversarial loss
+        # Adversarial loss - use real_labels with correct shape
         g_adv_loss = adversarial_loss(fake_outputs, real_labels)
         
         # Content loss - reduced weight to allow more variation
@@ -126,8 +126,11 @@ for epoch in range(num_epochs):
             fake = generator(fixed_sketches, noise)
             variations.append(fake)
         
+        # Convert sketches from 1 channel to 3 channels by repeating the grayscale values
+        fixed_sketches_rgb = fixed_sketches.repeat(1, 3, 1, 1)
+        
         # Save grid with original sketches and variations
-        grid_images = torch.cat([sketches[:4]] + variations, dim=0)
+        grid_images = torch.cat([fixed_sketches_rgb] + variations, dim=0)
         save_image(grid_images, f"outputs/epoch_{epoch}_variations.png", nrow=4, normalize=True)
     
     # Save model checkpoints
