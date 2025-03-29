@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 import argparse
 import numpy as np
+import shutil
 from sketch_to_image_gan import Generator  # Import your trained Generator
 
 # Load the trained generator
@@ -22,18 +23,24 @@ transform = transforms.Compose([
 ])
 
 def generate_image(sketch_path, output_dir="generated_images", num_variations=3, seed=None):
-    """Generate multiple variations of an image from a sketch and save them."""
-    # Ensure the output directory exists
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    """Generate multiple variations of an image from a sketch and save them in a timestamped subfolder."""
+    # Generate timestamp for the subfolder name
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    # Create a subfolder inside output_dir using the timestamp
+    timestamped_output_dir = os.path.join(output_dir, f"run_{timestamp}")
+    os.makedirs(timestamped_output_dir, exist_ok=True)
+    
+    # Copy the original sketch to the generated folder with its original filename
+    sketch_filename = os.path.basename(sketch_path)
+    sketch_copy_path = os.path.join(timestamped_output_dir, sketch_filename)
+    shutil.copy(sketch_path, sketch_copy_path)
+    print(f"Sketch copied to: {sketch_copy_path}")
 
     # Set seed for reproducibility if provided
     if seed is not None:
         torch.manual_seed(seed)
         np.random.seed(seed)
-
-    # Generate timestamp base for filenames
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # Load and preprocess the sketch
     sketch = Image.open(sketch_path).convert("L")  # Load as grayscale
@@ -56,15 +63,15 @@ def generate_image(sketch_path, output_dir="generated_images", num_variations=3,
         # Create image from array
         img = Image.fromarray(img_array)
         
-        # Save the image
-        output_filename = f"generated_image_{timestamp}_var{i+1}.png"
-        output_path = os.path.join(output_dir, output_filename)
+        # Save the image in the timestamped subfolder
+        output_filename = f"generated_image_var{i+1}.png"
+        output_path = os.path.join(timestamped_output_dir, output_filename)
         img.save(output_path)
         print(f"Generated variation {i+1} saved at: {output_path}")
         
         generated_images.append(img)
     
-    # Also save a grid view of all variations
+    # Also save a grid view of all variations in the timestamped subfolder
     grid_width = min(4, num_variations)
     grid_height = (num_variations + grid_width - 1) // grid_width
     cell_size = 512
@@ -75,7 +82,7 @@ def generate_image(sketch_path, output_dir="generated_images", num_variations=3,
         grid_y = (i // grid_width) * cell_size
         grid_img.paste(img, (grid_x, grid_y))
     
-    grid_path = os.path.join(output_dir, f"grid_variations_{timestamp}.png")
+    grid_path = os.path.join(timestamped_output_dir, "grid_variations.png")
     grid_img.save(grid_path)
     print(f"Grid of all variations saved at: {grid_path}")
     
