@@ -5,10 +5,8 @@ from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 import os
 import numpy as np
-
-# Load models from previous script
-from sketch_to_image_gan import Generator, MultiScaleDiscriminator
 from train_sketch_gan import SketchToImageDataset, transform
+from sketch_to_image_gan import Generator, MultiScaleDiscriminator
 
 # Clear unused GPU memory
 torch.cuda.empty_cache()
@@ -20,7 +18,6 @@ lr = 0.0002
 beta1 = 0.5
 beta2 = 0.999
 lambda_pixel = 100  # L1 loss weight
-lambda_feat = 10    # Feature matching loss weight
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Initialize models
@@ -31,13 +28,6 @@ discriminator = MultiScaleDiscriminator().to(device)
 adversarial_loss = nn.BCELoss()
 l1_loss = nn.L1Loss()
 
-# Feature matching loss
-def feature_matching_loss(real_features, fake_features):
-    loss = 0
-    for real_feat, fake_feat in zip(real_features, fake_features):
-        loss += torch.mean(torch.abs(real_feat - fake_feat))
-    return loss / len(real_features)
-
 # Optimizers
 g_optimizer = optim.Adam(generator.parameters(), lr=lr, betas=(beta1, beta2))
 d_optimizer = optim.Adam(discriminator.parameters(), lr=lr, betas=(beta1, beta2))
@@ -47,8 +37,8 @@ g_scheduler = optim.lr_scheduler.CosineAnnealingLR(g_optimizer, T_max=num_epochs
 d_scheduler = optim.lr_scheduler.CosineAnnealingLR(d_optimizer, T_max=num_epochs, eta_min=lr*0.1)
 
 # Load dataset
-dataset = SketchToImageDataset("C:\\Users\\Bimsara\\Documents\\fyp\\VasthraAI_IMPL\\GEN_2\\dataset\\sketches", 
-                             "C:\\Users\\Bimsara\\Documents\\fyp\\VasthraAI_IMPL\\GEN_2\\dataset\\real_images", 
+dataset = SketchToImageDataset("C:\\Users\\Bimsara\\Documents\\fyp\\VasthraAI_IMPL\\GEN_5\\dataset\\sketches", 
+                             "C:\\Users\\Bimsara\\Documents\\fyp\\VasthraAI_IMPL\\GEN_5\\dataset\\real_images", 
                              transform=transform)
 data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
@@ -58,13 +48,18 @@ if not os.path.exists("outputs"):
 if not os.path.exists("checkpoints"):
     os.makedirs("checkpoints")
 
+# Print first batch shapes for debugging
+for sketches, real_images in data_loader:
+    print(f"Sketch shape: {sketches.shape}, Real shape: {real_images.shape}")
+    break
+
 # Training loop
 for epoch in range(num_epochs):
     for i, (sketches, real_images) in enumerate(data_loader):
         sketches, real_images = sketches.to(device), real_images.to(device)
         batch_size = sketches.size(0)
 
-        # Generate images
+        # Generate fake images
         fake_images = generator(sketches)
 
         # ---------------------
@@ -72,23 +67,26 @@ for epoch in range(num_epochs):
         # ---------------------
         d_optimizer.zero_grad()
         
-        # Compute losses for real images at multiple scales
+        # Get discriminator outputs for real and fake images
         real_preds_1, real_preds_2 = discriminator(real_images)
-        real_labels = torch.ones_like(real_preds_1).to(device)
-        
-        # Compute losses for fake images at multiple scales
         fake_preds_1, fake_preds_2 = discriminator(fake_images.detach())
-        fake_labels = torch.zeros_like(fake_preds_1).to(device)
         
-        # Combine losses from different scales
-        d_real_loss = (adversarial_loss(real_preds_1, real_labels) + 
-                     adversarial_loss(real_preds_2, real_labels)) / 2
-        d_fake_loss = (adversarial_loss(fake_preds_1, fake_labels) + 
-                     adversarial_loss(fake_preds_2, fake_labels)) / 2
+        # Create labels for loss calculation
+        # Make sure we use the correct shape based on the discriminator's output
+        real_labels_1 = torch.ones_like(real_preds_1).to(device)
+        real_labels_2 = torch.ones_like(real_preds_2).to(device)
+        fake_labels_1 = torch.zeros_like(fake_preds_1).to(device)
+        fake_labels_2 = torch.zeros_like(fake_preds_2).to(device)
         
-        # Add some noise to labels for more stable training
-        real_labels = torch.FloatTensor(batch_size, 1, 16, 16).uniform_(0.7, 1.0).to(device)
-        fake_labels = torch.FloatTensor(batch_size, 1, 16, 16).uniform_(0.0, 0.3).to(device)
+        # Add label smoothing for more stable training
+        real_labels_1 = real_labels_1 * 0.9
+        real_labels_2 = real_labels_2 * 0.9
+        
+        # Calculate discriminator losses
+        d_real_loss = (adversarial_loss(real_preds_1, real_labels_1) + 
+                      adversarial_loss(real_preds_2, real_labels_2)) / 2
+        d_fake_loss = (adversarial_loss(fake_preds_1, fake_labels_1) + 
+                      adversarial_loss(fake_preds_2, fake_labels_2)) / 2
         
         d_loss = d_real_loss + d_fake_loss
         
@@ -100,12 +98,14 @@ for epoch in range(num_epochs):
         # ---------------------
         g_optimizer.zero_grad()
         
-        # Compute adversarial loss
+        # Get discriminator outputs for generated images
         fake_preds_1, fake_preds_2 = discriminator(fake_images)
-        g_adv_loss = (adversarial_loss(fake_preds_1, real_labels) + 
-                    adversarial_loss(fake_preds_2, real_labels)) / 2
         
-        # Pixel-wise loss
+        # Adversarial loss wants the generator to fool the discriminator
+        g_adv_loss = (adversarial_loss(fake_preds_1, real_labels_1) + 
+                     adversarial_loss(fake_preds_2, real_labels_2)) / 2
+        
+        # Pixel-wise loss between generated and real images
         g_pixel_loss = l1_loss(fake_images, real_images) * lambda_pixel
         
         # Total generator loss
@@ -115,7 +115,7 @@ for epoch in range(num_epochs):
         g_optimizer.step()
 
         # Print progress
-        if i % 20 == 0:  # Increased frequency for better monitoring
+        if i % 20 == 0:
             print(f"Epoch [{epoch+1}/{num_epochs}], Step [{i}/{len(data_loader)}], "
                  f"D Loss: {d_loss.item():.4f}, G Loss: {g_loss.item():.4f}, "
                  f"G Pixel Loss: {g_pixel_loss.item()/lambda_pixel:.4f}")
@@ -129,7 +129,9 @@ for epoch in range(num_epochs):
         with torch.no_grad():
             # Generate a batch of images and save them
             fake_images = generator(sketches)
-            img_grid = torch.cat((sketches.repeat(1, 3, 1, 1), fake_images, real_images), dim=0)
+            # Repeat single-channel sketches to 3 channels for visualization
+            sketches_3c = sketches.repeat(1, 3, 1, 1) 
+            img_grid = torch.cat((sketches_3c, fake_images, real_images), dim=0)
             save_image(img_grid, f"outputs/epoch_{epoch+1}.png", nrow=batch_size, normalize=True)
     
     # Save model checkpoints periodically

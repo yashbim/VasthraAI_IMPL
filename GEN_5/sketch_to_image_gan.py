@@ -105,41 +105,55 @@ class Discriminator(nn.Module):
     def __init__(self, input_channels=3, base_filters=64):
         super(Discriminator, self).__init__()
         
-        self.model = nn.Sequential(
-            # Initial layer without batch norm
+        # Initial layer without batch norm
+        self.layer1 = nn.Sequential(
             nn.Conv2d(input_channels, base_filters, kernel_size=4, stride=2, padding=1),
-            nn.LeakyReLU(0.2, inplace=True),
-            
-            # Additional downsampling layers
+            nn.LeakyReLU(0.2, inplace=True)
+        )
+        
+        # Middle layers
+        self.layer2 = nn.Sequential(
             nn.Conv2d(base_filters, base_filters*2, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(base_filters*2),
-            nn.LeakyReLU(0.2, inplace=True),
-            
+            nn.LeakyReLU(0.2, inplace=True)
+        )
+        
+        self.layer3 = nn.Sequential(
             nn.Conv2d(base_filters*2, base_filters*4, kernel_size=4, stride=2, padding=1),
             nn.BatchNorm2d(base_filters*4),
-            nn.LeakyReLU(0.2, inplace=True),
-            
-            nn.Conv2d(base_filters*4, base_filters*8, kernel_size=4, stride=2, padding=1),
+            nn.LeakyReLU(0.2, inplace=True)
+        )
+        
+        self.layer4 = nn.Sequential(
+            nn.Conv2d(base_filters*4, base_filters*8, kernel_size=4, stride=1, padding=1),
             nn.BatchNorm2d(base_filters*8),
-            nn.LeakyReLU(0.2, inplace=True),
-            
-            # Final layer
+            nn.LeakyReLU(0.2, inplace=True)
+        )
+        
+        # Final layer
+        self.layer5 = nn.Sequential(
             nn.Conv2d(base_filters*8, 1, kernel_size=4, stride=1, padding=1),
             nn.Sigmoid()
         )
     
     def forward(self, x):
-        return self.model(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        x = self.layer5(x)
+        return x
 
-# Create a multi-scale discriminator for better handling of different pattern sizes
 class MultiScaleDiscriminator(nn.Module):
     def __init__(self, input_channels=3):
         super(MultiScaleDiscriminator, self).__init__()
         
-        # Three discriminators at different scales
+        # Two discriminators at different scales
         self.disc_original = Discriminator(input_channels)
-        self.disc_downscaled = Discriminator(input_channels)
+        
+        # Downsample before passing to the second discriminator
         self.downsample = nn.AvgPool2d(kernel_size=3, stride=2, padding=1, count_include_pad=False)
+        self.disc_downscaled = Discriminator(input_channels)
         
     def forward(self, x):
         # Get results at original scale
